@@ -4,20 +4,27 @@ const morgan = require('morgan');
 
 dotenv.config({path:'config.env'});
 
+const dbConnection = require('./config/database');
+const categoryRoute = require('./routes/categoryRoute');
+
+// Connect with DB:
+dbConnection();
+
+// Express App:
 const app = express();
 
+// Middlewares:
+app.use(express.json());
 
-const mood = process.env.NODE_ENV;
-if ( mood === 'development' ) {
+if ( process.env.NODE_ENV === 'development' ) {
 	app.use(morgan('dev'));
-	console.log(`mode: ${mood}`);
+	console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-app.get('/', (req, res) => {
-	res.send('our app v3');
-})
+// Mount Routes:
+app.use('/api/v1/categores', categoryRoute);
 
-const port = process.PORT || 8000;
-app.listen(port, () => {
-	console.log(`App Running on port ${port}`);
+const PORT = process.PORT || 8000;
+app.listen(PORT, () => {
+	console.log(`App Running on port ${PORT}`);
 });
