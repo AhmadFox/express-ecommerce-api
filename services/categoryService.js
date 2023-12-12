@@ -1,6 +1,6 @@
 const slugify = require('slugify');
 const asyncHandler = require('express-async-handler');
-
+const ErrorModule  = require('../utils/errorModule');
 const CategoryModule = require('../modules/categoryModel');
 
 /**
@@ -23,11 +23,11 @@ exports.getCategories = asyncHandler(async (req, res) => {
  * @access: Public
  * @description: Get specific category by ID
 */
-exports.getCategorie = asyncHandler(async (req, res) => {
+exports.getCategorie = asyncHandler(async (req, res, next) => {
 	const { id } = req.params;
 	const category = await CategoryModule.findById(id);
 	if(!category) {
-		res.status(404).json({ msg: `Category Not Find!` })
+		return next(new ErrorModule(`No category for this id ${id}`, 404));
 	}
 	res.status(200).json({ data: category });
 })
@@ -53,7 +53,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
  * @access: Private
  * @description: Update spisefic category by ID
 */
-exports.updateCategory = asyncHandler(async(req, res) => {
+exports.updateCategory = asyncHandler(async(req, res, next) => {
 	const { id } = req.params;
 	const { name } = req.body;
 
@@ -63,7 +63,7 @@ exports.updateCategory = asyncHandler(async(req, res) => {
 		{ new: true }
 	);
 	if(!category) {
-		res.status(404).json({ msg: `Category Not Find!` })
+		return next(new ErrorModule(`No category for this id ${id}`, 404));
 	}
 	res.status(201).json({ data: category });
 });
@@ -74,12 +74,12 @@ exports.updateCategory = asyncHandler(async(req, res) => {
  * @access: Private
  * @description: Delete spisefic category by ID
 */
-exports.deleteCategory = asyncHandler(async(req, res) => {
+exports.deleteCategory = asyncHandler(async(req, res, next) => {
 	const { id } = req.params;
 
 	const category = await CategoryModule.findByIdAndDelete(id);
 	if(!category) {
-		res.status(404).json({ msg: `Category Not Find!` })
+		return next(new ErrorModule(`No category for this id ${id}`, 404));
 	}
 	res.status(201).json({ data: category });
 });
